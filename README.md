@@ -10,6 +10,7 @@ Tudo o que é preciso para um sistema **enviar mensagens e documentos pelo Whats
 
 | | |
 | --- | --- |
+| [0. Preparar o servidor](docs/00-preparar-servidor.md) | do Ubuntu zerado ao Docker: usuário, chave SSH, senha desligada, fuso, atualizações, swap, firewall, DNS (e script que faz quase tudo) |
 | [1. Visão geral](docs/01-visao-geral.md) | peças, caminho de uma mensagem, situações da fila (com diagramas) |
 | [2. Instalação](docs/02-instalacao.md) | passo a passo, proxy com HTTPS, firewall, atualização |
 | [3. Configuração](docs/03-configuracao.md) | todas as variáveis, o compose linha a linha, opções da fila |
@@ -22,7 +23,7 @@ Tudo o que é preciso para um sistema **enviar mensagens e documentos pelo Whats
 
 ## Começo rápido
 
-No servidor (Linux com Docker):
+No servidor (Ubuntu com Docker; servidor zerado? comece pelo [capítulo 0](docs/00-preparar-servidor.md)):
 
 ```bash
 git clone https://github.com/Luanbc/evo.git kit-evolution && cd kit-evolution
@@ -76,7 +77,7 @@ Cada regra veio de um problema real em produção:
 
 ```
 docker/      docker-compose.yml e .env.exemplo
-scripts/     evo.sh (operação) e monitor.sh (aviso de queda)
+scripts/     evo.sh (operação), monitor.sh (aviso de queda), preparar-servidor.sh (servidor do zero)
 lib/         evolution.js · validador.js · fila.js · armazenamento.js · webhook.js · index.js
 exemplos/    robo.mjs · enfileirar.mjs · webhook.mjs
 test/        testes com Evolution falsa (npm test)

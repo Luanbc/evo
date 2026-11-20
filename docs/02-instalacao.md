@@ -2,6 +2,8 @@
 
 ## Requisitos
 
+Servidor zerado? Faça antes o [0. Preparar o servidor](00-preparar-servidor.md): usuário, chave SSH, firewall, swap, Docker e DNS.
+
 | Item | Mínimo | Observação |
 | --- | --- | --- |
 | Servidor | Linux 64 bits, 2 GB de RAM, 10 GB de disco | Ubuntu 22.04/24.04 testado |
