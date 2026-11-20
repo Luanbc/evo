@@ -1,0 +1,68 @@
+# Evolution API (WhatsApp) + Postgres + Redis — kit isolado.
+# Senhas e endereços ficam no arquivo .env (copie de .env.exemplo).
+# A API fica presa ao próprio servidor (127.0.0.1:8080). Para acesso externo, publique por um proxy com HTTPS
+# (Nginx Proxy Manager, Caddy, Cloudflare Tunnel...) e nunca exponha a porta 8080 direto na internet.
+
+name: evolution
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: evo-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: evolution
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      POSTGRES_DB: evolution
+    volumes:
+      - ./dados/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolution -d evolution"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: evo-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - ./dados/redis:/data
+
+  evolution-api:
+    # Mesma versão testada em produção (v2.3.7). Fixada por digest para não mudar sozinha num "pull".
+    image: evoapicloud/evolution-api@sha256:966625532d9076a2381e973a271307d107e6f070450de3abeeea8bd18be07252
+    container_name: evolution-api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${EVOLUTION_PORTA:-8080}:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    environment:
+      - SERVER_URL=${SERVER_URL:-http://localhost:8080}
+      - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY:?defina AUTHENTICATION_API_KEY no .env}
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:${POSTGRES_PASSWORD}@postgres:5432/evolution?schema=public
+      - DATABASE_CONNECTION_CLIENT_NAME=evolution_api
+      - DATABASE_SAVE_DATA_INSTANCE=true
+      - DATABASE_SAVE_DATA_NEW_MESSAGE=true
+      - DATABASE_SAVE_MESSAGE_UPDATE=true
+      - DATABASE_SAVE_DATA_CONTACTS=true
+      - DATABASE_SAVE_DATA_CHATS=true
+      - REDIS_URI=redis://redis:6379/1
+      - REDIS_PREFIX_KEY=evolution
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://redis:6379/2
+      - CACHE_REDIS_PREFIX_KEY=evolution_cache
+      - CACHE_LOCAL_ENABLED=false
+      - WEBSOCKET_ENABLED=false
+      - CHATWOOT_ENABLED=false
+      - DEL_INSTANCE=false
+      - LOG_LEVEL=ERROR,WARN,INFO
+      - QRCODE_LIMIT=30
+      - CONFIG_SESSION_PHONE_CLIENT=${NOME_APARELHO:-Evolution}
+      - CONFIG_SESSION_PHONE_NAME=Chrome

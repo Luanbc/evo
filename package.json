@@ -1,0 +1,12 @@
+{
+  "name": "kit-evolution",
+  "version": "1.0.0",
+  "description": "Evolution API (WhatsApp): instalação, operação e biblioteca de envio com fila, validação e proteção contra envio em dobro.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": { ".": "./lib/index.js" },
+  "engines": { "node": ">=18" },
+  "scripts": { "test": "node --test test/*.test.js" },
+  "license": "UNLICENSED",
+  "private": true
+}

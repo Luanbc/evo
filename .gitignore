@@ -1,0 +1,8 @@
+.env
+docker/.env
+docker/dados/
+backups/
+qrcode-*.png
+node_modules/
+*.db
+*.db-*
